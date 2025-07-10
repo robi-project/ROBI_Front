@@ -16,11 +16,38 @@ const COLORS = {
   recolte: 'bg-orange-100 border-orange-400',
 };
 
-const parcelles = Array.from({ length: 10 }, (_, i) => `Parcelle ${i + 1}`);
+// Structure des zones et planches (identique à WeeklyPlan)
+const ZONES = [
+  {
+    name: 'Zone A1',
+    planches: [
+      { name: 'Planche A1-P1' },
+      { name: 'Planche A1-P2' },
+      { name: 'Planche A1-P3' },
+    ],
+  },
+  {
+    name: 'Zone A2',
+    planches: [
+      { name: 'Planche A2-P1' },
+      { name: 'Planche A2-P2' },
+    ],
+  },
+  {
+    name: 'Zone A3',
+    planches: [
+      { name: 'Planche A3-P1' },
+      { name: 'Planche A3-P2' },
+    ],
+  },
+];
+
+// Extraire toutes les planches pour les périodes
+const allPlanches = ZONES.flatMap(zone => zone.planches);
 
 function getPeriodsForYear(year: number) {
-  // Génère des périodes fictives différentes selon l'année
-  return parcelles.map((_, idx) => {
+  // Génère des périodes fictives différentes selon l'année pour chaque planche
+  return allPlanches.map((planche, idx) => {
     const base = (year - 2022) * 2 + idx;
     return {
       semis: [2 + base, 10 + base],
@@ -57,20 +84,20 @@ const AnnualPlan: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Planification annuelle des cultures</h1>
-            <p className="text-gray-500 text-sm">Inventaire des stocks par espèce, variété et fournisseur</p>
+            <p className="text-gray-500 text-sm">Planification des périodes de semis, désherbage et récolte par planche</p>
           </div>
           <div className="flex items-center space-x-2">
             <button className="btn-secondary flex items-center">📤 Exporter</button>
             <button className="btn-primary flex items-center">💾 Enregistrer</button>
           </div>
         </div>
-        <p className="text-gray-600 mb-4">Définissez les périodes de semis, désherbage et récolte pour chaque parcelle</p>
+        <p className="text-gray-600 mb-4">Définissez les périodes de semis, désherbage et récolte pour chaque planche</p>
         <div className="flex items-center space-x-4 mb-4">
           <label className="text-gray-700 font-medium">Année:</label>
           <select value={year} onChange={handleYearChange} className="input-field w-24">
             {YEARS.map(y => <option key={y}>{y}</option>)}
           </select>
-          <button className="text-green-600 font-medium flex items-center hover:underline"><span className="text-lg mr-1">●</span>Ajouter une parcelle</button>
+          <button className="text-green-600 font-medium flex items-center hover:underline"><span className="text-lg mr-1">●</span>Ajouter une planche</button>
         </div>
         {/* Légende */}
         <div className="flex items-center space-x-6 mb-4">
@@ -83,7 +110,7 @@ const AnnualPlan: React.FC = () => {
           <table className="min-w-full text-sm">
             <thead>
               <tr>
-                <th className="px-4 py-2 text-left font-semibold text-gray-700">Parcelle</th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-700">Zone / Planche</th>
                 {MONTHS.map((month, i) => (
                   <th key={month} colSpan={i === 11 ? 5 : 4} className="px-1 py-2 text-center font-normal text-gray-500 border-b border-gray-100">{month}</th>
                 ))}
@@ -108,21 +135,29 @@ const AnnualPlan: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {parcelles.map((parcelle, idx) => (
-                <tr key={parcelle} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 font-medium text-gray-700 whitespace-nowrap">{parcelle}</td>
-                  {WEEKS.map(week => {
-                    let color = '';
-                    if (week >= periods[idx].semis[0] && week <= periods[idx].semis[1]) color = COLORS.semis;
-                    if (week >= periods[idx].desherbage[0] && week <= periods[idx].desherbage[1]) color = COLORS.desherbage;
-                    if (week >= periods[idx].recolte[0] && week <= periods[idx].recolte[1]) color = COLORS.recolte;
+              {ZONES.map((zone) => (
+                <React.Fragment key={zone.name}>
+                  {/* Planches de la zone */}
+                  {zone.planches.map((planche, plancheIdx) => {
+                    const globalIdx = ZONES.flatMap(z => z.planches).findIndex(p => p.name === planche.name);
                     return (
-                      <td key={week} className="px-0 py-1 text-center">
-                        {color && <div className={`h-3 rounded ${color}`}></div>}
-                      </td>
+                      <tr key={planche.name} className="hover:bg-gray-50 border-b border-gray-100">
+                        <td className="px-4 py-2 font-medium text-gray-700 whitespace-nowrap">{planche.name}</td>
+                        {WEEKS.map(week => {
+                          let color = '';
+                          if (week >= periods[globalIdx].semis[0] && week <= periods[globalIdx].semis[1]) color = COLORS.semis;
+                          if (week >= periods[globalIdx].desherbage[0] && week <= periods[globalIdx].desherbage[1]) color = COLORS.desherbage;
+                          if (week >= periods[globalIdx].recolte[0] && week <= periods[globalIdx].recolte[1]) color = COLORS.recolte;
+                          return (
+                            <td key={week} className="px-0 py-1 text-center">
+                              {color && <div className={`h-3 rounded ${color}`}></div>}
+                            </td>
+                          );
+                        })}
+                      </tr>
                     );
                   })}
-                </tr>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
