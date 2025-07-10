@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navigation from '../components/Navigation';
 import { ChevronDownIcon, ChevronRightIcon, UserIcon, Cog6ToothIcon, ChevronLeftIcon, ChevronRightIcon as ArrowRightIcon } from '@heroicons/react/24/outline';
+import { useSearchParams } from 'react-router-dom';
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -110,11 +111,20 @@ function getWeekLabel(dates: Date[]) {
 }
 
 const WeeklyPlan: React.FC = () => {
-  // Semaine du 3 février 2025 par défaut
-  const [weekStart, setWeekStart] = useState(new Date('2025-02-03'));
+  const [searchParams] = useSearchParams();
+  const dateParam = searchParams.get('date');
+  // Semaine du 3 février 2025 par défaut, ou date passée en paramètre
+  const initialDate = dateParam ? new Date(dateParam) : new Date('2025-02-03');
+  const [weekStart, setWeekStart] = useState(initialDate);
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({});
+  const [selectedZone, setSelectedZone] = useState<string>('Toutes les zones');
 
   const weekDates = getWeekDates(weekStart);
+
+  // Filtrer les zones selon la sélection
+  const filteredZones = selectedZone === 'Toutes les zones' 
+    ? ZONES 
+    : ZONES.filter(zone => zone.name === selectedZone);
 
   const prevWeek = () => {
     const d = new Date(weekStart);
@@ -131,6 +141,22 @@ const WeeklyPlan: React.FC = () => {
     setOpenZones((prev) => ({ ...prev, [zoneName]: !prev[zoneName] }));
   };
 
+  const expandAllZones = () => {
+    const allOpen = filteredZones.reduce((acc, zone) => {
+      acc[zone.name] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setOpenZones(allOpen);
+  };
+
+  const collapseAllZones = () => {
+    const allClosed = filteredZones.reduce((acc, zone) => {
+      acc[zone.name] = false;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setOpenZones(allClosed);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation />
@@ -144,11 +170,34 @@ const WeeklyPlan: React.FC = () => {
             <button onClick={prevWeek} className="btn-secondary flex items-center px-2 py-2"><ChevronLeftIcon className="w-5 h-5" /></button>
             <span className="font-medium text-gray-700 text-lg">{getWeekLabel(weekDates)}</span>
             <button onClick={nextWeek} className="btn-secondary flex items-center px-2 py-2"><ArrowRightIcon className="w-5 h-5" /></button>
-            <select className="input-field">
+            <select 
+              value={selectedZone} 
+              onChange={(e) => setSelectedZone(e.target.value)}
+              className="input-field"
+            >
               <option>Toutes les zones</option>
               {ZONES.map(z => <option key={z.name}>{z.name}</option>)}
             </select>
-            <span className="ml-2 px-3 py-1 rounded-full bg-green-100 text-green-800 font-semibold text-sm border border-green-300">Semaine {getWeekNumber(weekDates[0])}</span>
+            <span className="ml-4 px-4 py-2 rounded-full bg-green-100 text-green-800 font-semibold text-sm border border-green-300 min-w-[120px] text-center">
+              Semaine {getWeekNumber(weekDates[0])}
+            </span>
+          </div>
+          {/* Boutons pour tout plier/déplier */}
+          <div className="flex items-center space-x-2 mb-4">
+            <button 
+              onClick={expandAllZones}
+              className="btn-secondary text-sm px-3 py-1 flex items-center"
+            >
+              <ChevronDownIcon className="w-4 h-4 mr-1" />
+              Tout déplier
+            </button>
+            <button 
+              onClick={collapseAllZones}
+              className="btn-secondary text-sm px-3 py-1 flex items-center"
+            >
+              <ChevronRightIcon className="w-4 h-4 mr-1" />
+              Tout plier
+            </button>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -161,7 +210,7 @@ const WeeklyPlan: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {ZONES.map((zone) => (
+                {filteredZones.map((zone) => (
                   <React.Fragment key={zone.name}>
                     {/* Zone header (accordion) */}
                     <tr className="bg-gray-50 border-t border-gray-100">
@@ -173,7 +222,7 @@ const WeeklyPlan: React.FC = () => {
                       </td>
                     </tr>
                     {/* Planches (accordion content) */}
-                    {openZones[zone.name] !== false && zone.planches.map((planche) => (
+                    {openZones[zone.name] && zone.planches.map((planche) => (
                       <tr key={planche.name} className="border-b border-gray-100">
                         <td className="px-4 py-2 text-gray-700 whitespace-nowrap font-medium bg-gray-50">{planche.name}</td>
                         {weekDates.map((date, dayIdx) => {
