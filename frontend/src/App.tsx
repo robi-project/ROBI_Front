@@ -4,6 +4,7 @@ import Navigation from './components/Navigation';
 import Dashboard from './pages/Dashboard';
 import './index.css';
 import SeedManagement from './pages/SeedManagement';
+import AnnualPlan from './pages/AnnualPlan';
 
 // Composant de protection des routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -127,6 +128,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <SeedManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/annual-plan"
+            element={
+              <ProtectedRoute>
+                <AnnualPlan />
               </ProtectedRoute>
             }
           />

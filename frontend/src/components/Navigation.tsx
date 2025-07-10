@@ -8,7 +8,8 @@ import {
   UserIcon,
   Bars3Icon,
   XMarkIcon,
-  Squares2X2Icon // nouvelle icône pour les semis
+  Squares2X2Icon, // nouvelle icône pour les semis
+  CalendarDaysIcon // nouvelle icône pour le plan annuel
 } from '@heroicons/react/24/outline';
 import { authService } from '../services/authService';
 
@@ -19,6 +20,7 @@ const Navigation: React.FC = () => {
 
   const navigation = [
     { name: 'Tableau de bord', href: '/', icon: HomeIcon },
+    { name: 'Plan annuel', href: '/annual-plan', icon: CalendarDaysIcon },
     { name: 'Mes Fermes', href: '/farms', icon: MapIcon },
     { name: 'Robots', href: '/robots', icon: CogIcon },
     { name: 'Gestion des semis', href: '/seeds', icon: Squares2X2Icon },
