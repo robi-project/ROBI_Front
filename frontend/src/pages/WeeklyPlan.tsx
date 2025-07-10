@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import Navigation from '../components/Navigation';
-import { ChevronDownIcon, ChevronRightIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronRightIcon, UserIcon, Cog6ToothIcon, ChevronLeftIcon, ChevronRightIcon as ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-const DATES = [3, 4, 5, 6, 7, 8, 9];
 
 // Couleurs par type de tâche
 const TASK_COLORS: Record<string, string> = {
@@ -14,6 +13,7 @@ const TASK_COLORS: Record<string, string> = {
   'Récolte': 'bg-yellow-50 border-yellow-300 text-yellow-900',
 };
 
+// Exemple de structure de tâches avec date
 const ZONES = [
   {
     name: 'Zone A1',
@@ -22,16 +22,16 @@ const ZONES = [
       {
         name: 'Planche A1-P1',
         tasks: [
-          { day: 0, label: 'Robot-01', type: 'Arrosage', robot: true },
-          { day: 1, label: 'Robot-02', type: 'Préparation', robot: true },
+          { date: '2025-02-03', label: 'Robot-01', type: 'Arrosage', robot: true },
+          { date: '2025-02-04', label: 'Robot-02', type: 'Préparation', robot: true },
         ],
       },
       {
         name: 'Planche A1-P2',
         tasks: [
-          { day: 0, label: 'Marc D.', type: 'Désherbage', robot: false },
-          { day: 1, label: 'Robot-03', type: 'Arrosage', robot: true },
-          { day: 3, label: 'Julie L.', type: 'Récolte', robot: false },
+          { date: '2025-02-03', label: 'Marc D.', type: 'Désherbage', robot: false },
+          { date: '2025-02-04', label: 'Robot-03', type: 'Arrosage', robot: true },
+          { date: '2025-02-06', label: 'Julie L.', type: 'Récolte', robot: false },
         ],
       },
       { name: 'Planche A1-P3', tasks: [] },
@@ -44,15 +44,15 @@ const ZONES = [
       {
         name: 'Planche A2-P1',
         tasks: [
-          { day: 2, label: 'Robot-01', type: 'Arrosage', robot: true },
-          { day: 3, label: 'Robot-01', type: 'Arrosage', robot: true },
+          { date: '2025-02-05', label: 'Robot-01', type: 'Arrosage', robot: true },
+          { date: '2025-02-06', label: 'Robot-01', type: 'Arrosage', robot: true },
         ],
       },
       {
         name: 'Planche A2-P2',
         tasks: [
-          { day: 1, label: 'Paul M.', type: 'Désherbage', robot: false },
-          { day: 4, label: 'Robot-01', type: 'Arrosage', robot: true },
+          { date: '2025-02-04', label: 'Paul M.', type: 'Désherbage', robot: false },
+          { date: '2025-02-07', label: 'Robot-01', type: 'Arrosage', robot: true },
         ],
       },
     ],
@@ -68,15 +68,64 @@ const ZONES = [
       {
         name: 'Planche A3-P2',
         tasks: [
-          { day: 6, label: 'Sophie R.', type: 'Récolte', robot: false },
+          { date: '2025-02-09', label: 'Sophie R.', type: 'Récolte', robot: false },
         ],
       },
     ],
   },
 ];
 
+function getWeekDates(startDate: Date) {
+  const dates: Date[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function formatDate(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatHeader(date: Date) {
+  return `${date.getDate()} ${date.toLocaleString('fr-FR', { month: 'short' })}`;
+}
+
+function getWeekNumber(date: Date) {
+  // ISO week number (lundi = premier jour)
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNum = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return weekNum;
+}
+
+function getWeekLabel(dates: Date[]) {
+  const first = dates[0];
+  const last = dates[6];
+  return `du ${first.getDate()} ${first.toLocaleString('fr-FR', { month: 'long' })} ${first.getFullYear()} au ${last.getDate()} ${last.toLocaleString('fr-FR', { month: 'long' })} ${last.getFullYear()}`;
+}
+
 const WeeklyPlan: React.FC = () => {
+  // Semaine du 3 février 2025 par défaut
+  const [weekStart, setWeekStart] = useState(new Date('2025-02-03'));
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({});
+
+  const weekDates = getWeekDates(weekStart);
+
+  const prevWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() - 7);
+    setWeekStart(d);
+  };
+  const nextWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + 7);
+    setWeekStart(d);
+  };
 
   const toggleZone = (zoneName: string) => {
     setOpenZones((prev) => ({ ...prev, [zoneName]: !prev[zoneName] }));
@@ -92,19 +141,22 @@ const WeeklyPlan: React.FC = () => {
             <button className="btn-primary flex items-center"><span className="mr-1">+</span>Nouvelle tâche</button>
           </div>
           <div className="flex items-center space-x-4 mb-4">
-            <button className="btn-secondary">Semaine du 3 - 9 Février 2025</button>
+            <button onClick={prevWeek} className="btn-secondary flex items-center px-2 py-2"><ChevronLeftIcon className="w-5 h-5" /></button>
+            <span className="font-medium text-gray-700 text-lg">{getWeekLabel(weekDates)}</span>
+            <button onClick={nextWeek} className="btn-secondary flex items-center px-2 py-2"><ArrowRightIcon className="w-5 h-5" /></button>
             <select className="input-field">
               <option>Toutes les zones</option>
               {ZONES.map(z => <option key={z.name}>{z.name}</option>)}
             </select>
+            <span className="ml-2 px-3 py-1 rounded-full bg-green-100 text-green-800 font-semibold text-sm border border-green-300">Semaine {getWeekNumber(weekDates[0])}</span>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr>
                   <th className="px-4 py-2 text-left font-semibold text-gray-700 w-48">Planches/Zones</th>
-                  {DAYS.map((day, i) => (
-                    <th key={day} className="px-4 py-2 text-center font-normal text-gray-500">{day} {DATES[i]}</th>
+                  {weekDates.map((date, i) => (
+                    <th key={i} className="px-4 py-2 text-center font-normal text-gray-500">{DAYS[i]} {formatHeader(date)}</th>
                   ))}
                 </tr>
               </thead>
@@ -124,8 +176,8 @@ const WeeklyPlan: React.FC = () => {
                     {openZones[zone.name] !== false && zone.planches.map((planche) => (
                       <tr key={planche.name} className="border-b border-gray-100">
                         <td className="px-4 py-2 text-gray-700 whitespace-nowrap font-medium bg-gray-50">{planche.name}</td>
-                        {DAYS.map((_, dayIdx) => {
-                          const task = planche.tasks.find(t => t.day === dayIdx);
+                        {weekDates.map((date, dayIdx) => {
+                          const task = planche.tasks.find(t => t.date === formatDate(date));
                           return (
                             <td key={dayIdx} className="px-2 py-2 text-center align-top">
                               {task && (
