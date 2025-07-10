@@ -126,6 +126,9 @@ const WeeklyPlan: React.FC = () => {
     ? ZONES 
     : ZONES.filter(zone => zone.name === selectedZone);
 
+  // Vérifier si toutes les zones sont ouvertes
+  const allZonesOpen = filteredZones.every(zone => openZones[zone.name]);
+
   const prevWeek = () => {
     const d = new Date(weekStart);
     d.setDate(d.getDate() - 7);
@@ -141,20 +144,22 @@ const WeeklyPlan: React.FC = () => {
     setOpenZones((prev) => ({ ...prev, [zoneName]: !prev[zoneName] }));
   };
 
-  const expandAllZones = () => {
-    const allOpen = filteredZones.reduce((acc, zone) => {
-      acc[zone.name] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-    setOpenZones(allOpen);
-  };
-
-  const collapseAllZones = () => {
-    const allClosed = filteredZones.reduce((acc, zone) => {
-      acc[zone.name] = false;
-      return acc;
-    }, {} as Record<string, boolean>);
-    setOpenZones(allClosed);
+  const toggleAllZones = () => {
+    if (allZonesOpen) {
+      // Fermer toutes les zones
+      const allClosed = filteredZones.reduce((acc, zone) => {
+        acc[zone.name] = false;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setOpenZones(allClosed);
+    } else {
+      // Ouvrir toutes les zones
+      const allOpen = filteredZones.reduce((acc, zone) => {
+        acc[zone.name] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setOpenZones(allOpen);
+    }
   };
 
   return (
@@ -182,28 +187,26 @@ const WeeklyPlan: React.FC = () => {
               Semaine {getWeekNumber(weekDates[0])}
             </span>
           </div>
-          {/* Boutons pour tout plier/déplier */}
-          <div className="flex items-center space-x-2 mb-4">
-            <button 
-              onClick={expandAllZones}
-              className="btn-secondary text-sm px-3 py-1 flex items-center"
-            >
-              <ChevronDownIcon className="w-4 h-4 mr-1" />
-              Tout déplier
-            </button>
-            <button 
-              onClick={collapseAllZones}
-              className="btn-secondary text-sm px-3 py-1 flex items-center"
-            >
-              <ChevronRightIcon className="w-4 h-4 mr-1" />
-              Tout plier
-            </button>
-          </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 text-left font-semibold text-gray-700 w-48">Planches/Zones</th>
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700 w-48">
+                    <div className="flex items-center">
+                      Planches/Zones
+                      <button 
+                        onClick={toggleAllZones}
+                        className="ml-2 p-1 hover:bg-gray-100 rounded transition-colors duration-150"
+                        title={allZonesOpen ? "Tout plier" : "Tout déplier"}
+                      >
+                        {allZonesOpen ? (
+                          <ChevronDownIcon className="w-4 h-4 text-gray-600" />
+                        ) : (
+                          <ChevronRightIcon className="w-4 h-4 text-gray-600" />
+                        )}
+                      </button>
+                    </div>
+                  </th>
                   {weekDates.map((date, i) => (
                     <th key={i} className="px-4 py-2 text-center font-normal text-gray-500">{DAYS[i]} {formatHeader(date)}</th>
                   ))}
