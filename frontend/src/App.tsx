@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import './index.css';
 import SeedManagement from './pages/SeedManagement';
 import AnnualPlan from './pages/AnnualPlan';
+import WeeklyPlan from './pages/WeeklyPlan';
 
 // Composant de protection des routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -136,6 +137,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AnnualPlan />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/weekly-plan"
+            element={
+              <ProtectedRoute>
+                <WeeklyPlan />
               </ProtectedRoute>
             }
           />

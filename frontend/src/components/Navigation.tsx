@@ -20,6 +20,7 @@ const Navigation: React.FC = () => {
 
   const navigation = [
     { name: 'Tableau de bord', href: '/', icon: HomeIcon },
+    { name: 'Semaine', href: '/weekly-plan', icon: CalendarDaysIcon },
     { name: 'Plan annuel', href: '/annual-plan', icon: CalendarDaysIcon },
     { name: 'Mes Fermes', href: '/farms', icon: MapIcon },
     { name: 'Robots', href: '/robots', icon: CogIcon },
