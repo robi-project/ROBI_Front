@@ -1,10 +1,10 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-const uri = process.env.NEXT_PUBLIC_GRAPHQL_API_URL;
+
+const uri = import.meta.env.VITE_GRAPHQL_API_URL;
 
 const client = new ApolloClient({
-  uri: uri || "/graphql",
+  uri: uri,
   cache: new InMemoryCache(),
-  credentials: "include",
 });
 
 export default client;
