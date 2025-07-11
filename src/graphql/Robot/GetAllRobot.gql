@@ -1,5 +1,5 @@
 query GetAllRobot {
-    getAllRobot {
+    getAllRobots {
         id
         nom
         etat

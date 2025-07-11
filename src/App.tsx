@@ -7,6 +7,7 @@ import SeedManagement from './pages/SeedManagement';
 import AnnualPlan from './pages/AnnualPlan';
 import WeeklyPlan from './pages/WeeklyPlan';
 import RobotsPage from './pages/RobotsPage';
+import { AddRobotForm } from "./graphql/Robot";
 
 // Composant de protection des routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -100,6 +101,7 @@ function App() {
               <ProtectedRoute>
                 <div>
                   <Navigation />
+                  <AddRobotForm /> {/* Ajout du formulaire ici */}
                   <RobotsPage />
                 </div>
               </ProtectedRoute>

@@ -1,12 +1,19 @@
 overwrite: true
-schema: "http://localhost:8080"
+schema:
+  - "http://localhost:8080/graphql":
+      headers:
+        "Content-Type": "application/json"
+        "apollo-require-preflight": "true"
 documents: "src/graphql/**/*.gql"
 generates:
+  src/graphql/generated/schema.ts:
+    plugins:
+      - "typescript"
   src/graphql/:
     preset: near-operation-file
     presetConfig:
       extension: ".generated.ts"
-      baseTypesPath: "../generated/schema.ts"
+      baseTypesPath: "src/graphql/generated/schema.ts"
       folder: "generated"
     plugins:
       - "typescript-operations"
