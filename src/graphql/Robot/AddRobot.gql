@@ -3,5 +3,7 @@ mutation AddRobot($data: NewRobotInput!) {
     id
     nom
     etat
+    date_achat
+    commentaires
   }
 }

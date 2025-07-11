@@ -4,6 +4,8 @@ import { useAddRobotMutation } from "./generated/AddRobot.generated";
 const AddRobotForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   const [nom, setNom] = useState("");
   const [etat, setEtat] = useState("");
+  const [dateAchat, setDateAchat] = useState("");
+  const [commentaires, setCommentaires] = useState("");
   const [addRobot, { data, loading, error }] = useAddRobotMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -12,12 +14,16 @@ const AddRobotForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
       variables: {
         data: {
           nom,
-          etat
+          etat,
+          date_achat: dateAchat,
+          commentaires
         }
       }
     });
     setNom("");
     setEtat("");
+    setDateAchat("");
+    setCommentaires("");
     if (onSuccess) onSuccess();
   };
 
@@ -40,6 +46,26 @@ const AddRobotForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
           value={etat}
           onChange={e => setEtat(e.target.value)}
           placeholder="État du robot"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Date d'achat</label>
+        <input
+          type="date"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          value={dateAchat}
+          onChange={e => setDateAchat(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Commentaires</label>
+        <input
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          value={commentaires}
+          onChange={e => setCommentaires(e.target.value)}
+          placeholder="Commentaires"
           required
         />
       </div>

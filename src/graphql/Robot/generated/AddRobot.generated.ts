@@ -8,7 +8,7 @@ export type AddRobotMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddRobotMutation = { __typename?: 'Mutation', addRobot: { __typename?: 'Robot', id: string, nom: string, etat: string } };
+export type AddRobotMutation = { __typename?: 'Mutation', addRobot: { __typename?: 'Robot', id: string, nom: string, etat: string, date_achat: any, commentaires: string } };
 
 
 export const AddRobotDocument = gql`
@@ -17,6 +17,8 @@ export const AddRobotDocument = gql`
     id
     nom
     etat
+    date_achat
+    commentaires
   }
 }
     `;
