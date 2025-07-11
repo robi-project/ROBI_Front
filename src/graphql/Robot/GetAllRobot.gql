@@ -1,0 +1,7 @@
+query GetAllRobot {
+    getAllRobots {
+        id
+        nom
+        etat
+    }
+}

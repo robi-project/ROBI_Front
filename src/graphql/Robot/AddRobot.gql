@@ -1,0 +1,9 @@
+mutation AddRobot($data: NewRobotInput!) {
+  addRobot(data: $data) {
+    id
+    nom
+    etat
+    date_achat
+    commentaires
+  }
+}
