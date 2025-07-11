@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PlayIcon, PauseIcon, HomeIcon, WrenchScrewdriverIcon, ExclamationTriangleIcon, CalendarIcon, PlusIcon, DeviceTabletIcon, Battery50Icon, Battery100Icon, Battery0Icon } from '@heroicons/react/24/outline';
-import Modal from "../../components/Modal";
+import Modal from "../components/Modal";
 import AddRobotForm from "../graphql/Robot/AddRobotForm";
 
 // Types
@@ -71,8 +71,20 @@ const RobotsPage: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">Gestion des Robots</h1>
               <p className="text-gray-500 text-sm">Supervisez et contrôlez votre flotte de robots autonomes</p>
             </div>
-            <button className="btn-primary flex items-center"><PlusIcon className="w-5 h-5 mr-2" />Ajouter Robot</button>
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition flex items-center"
+              onClick={() => setShowForm(true)}
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Ajouter Robot
+            </button>
           </div>
+
+          {showForm && (
+            <Modal onClose={() => setShowForm(false)}>
+              <AddRobotForm onSuccess={() => setShowForm(false)} />
+            </Modal>
+          )}
           {/* Statistiques */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {stats.map((stat) => (
@@ -167,19 +179,8 @@ const RobotsPage: React.FC = () => {
           </div>
         </div>
       </main>
-      <button
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition fixed bottom-20 right-10"
-        onClick={() => setShowForm(true)}
-      >
-        + Ajouter Robot
-      </button>
-      {showForm && (
-        <Modal onClose={() => setShowForm(false)}>
-          <AddRobotForm onSuccess={() => setShowForm(false)} />
-        </Modal>
-      )}
     </div>
   );
 };
 
-export default RobotsPage; 
+export default RobotsPage;

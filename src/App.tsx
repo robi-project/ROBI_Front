@@ -101,7 +101,6 @@ function App() {
               <ProtectedRoute>
                 <div>
                   <Navigation />
-                  <AddRobotForm /> {/* Ajout du formulaire ici */}
                   <RobotsPage />
                 </div>
               </ProtectedRoute>
