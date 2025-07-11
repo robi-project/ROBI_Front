@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { PlayIcon, PauseIcon, HomeIcon, WrenchScrewdriverIcon, ExclamationTriangleIcon, CalendarIcon, PlusIcon, DeviceTabletIcon, Battery50Icon, Battery100Icon, Battery0Icon } from '@heroicons/react/24/outline';
+import Modal from "../../components/Modal";
+import AddRobotForm from "../graphql/Robot/AddRobotForm";
 
 // Types
 interface Robot {
@@ -53,6 +55,7 @@ const getBatteryIcon = (battery: number) => {
 
 const RobotsPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('Tous les statuts');
+  const [showForm, setShowForm] = useState(false);
 
   // Filtrage des robots selon le statut sélectionné
   const filteredRobots = selectedStatus === 'Tous les statuts'
@@ -164,6 +167,17 @@ const RobotsPage: React.FC = () => {
           </div>
         </div>
       </main>
+      <button
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition fixed bottom-20 right-10"
+        onClick={() => setShowForm(true)}
+      >
+        + Ajouter Robot
+      </button>
+      {showForm && (
+        <Modal onClose={() => setShowForm(false)}>
+          <AddRobotForm onSuccess={() => setShowForm(false)} />
+        </Modal>
+      )}
     </div>
   );
 };
